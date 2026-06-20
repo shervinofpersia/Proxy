@@ -1,5 +1,4 @@
 import asyncio
-import json
 import time
 import urllib.request
 import aiohttp
@@ -77,13 +76,15 @@ async def main():
     
     print(f"Working proxies: {len(working_proxies)}")
     
-    # استخراج آی‌پی و پورت و اضافه کردن پیشوند socks5:// به خروجی نهایی
+    # استخراج آی‌پی و پورت و اضافه کردن پیشوند
     final_list = [f"socks5://{item['proxy']}" for item in working_proxies]
     
-    # ذخیره در فایل JSON (هر خط یک پروکسی به همراه ساختار آرایه)
+    # ذخیره در فایل به صورت خط‌به‌خط (فقط متن ساده)
     with open("Socks5.json", "w", encoding="utf-8") as f:
-        json.dump(final_list, f, indent=2)
-    print("Saved to Socks5.json")
+        for proxy in final_list:
+            f.write(f"{proxy}\n")
+            
+    print("Saved to Socks5.json successfully without brackets!")
 
 if __name__ == "__main__":
     asyncio.run(main())
