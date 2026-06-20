@@ -35,6 +35,9 @@ def get_raw_proxies():
                 for line in text.splitlines():
                     proxy = line.strip()
                     if proxy and ":" in proxy:
+                        # حذف پیشوند احتمالی برای یکدست‌سازی داده‌های خام ورودی
+                        if "://" in proxy:
+                            proxy = proxy.split("://")[-1]
                         raw_proxies.add(proxy)
             print(f"[+] Fetched from {url}")
         except Exception as e:
@@ -63,7 +66,6 @@ async def main():
     print(f"Total unique proxies found: {len(proxies)}")
     
     print("Testing proxies... (This might take a few minutes)")
-    # محدود کردن تعداد کانکشن‌های همزمان برای جلوگیری از خطای سیستم
     semaphore = asyncio.Semaphore(300) 
     
     tasks = [check_proxy(p, semaphore) for p in proxies]
@@ -75,10 +77,10 @@ async def main():
     
     print(f"Working proxies: {len(working_proxies)}")
     
-    # استخراج فقط آی‌پی و پورت به عنوان خروجی نهایی
-    final_list = [item["proxy"] for item in working_proxies]
+    # استخراج آی‌پی و پورت و اضافه کردن پیشوند socks5:// به خروجی نهایی
+    final_list = [f"socks5://{item['proxy']}" for item in working_proxies]
     
-    # ذخیره در فایل JSON (هر خط یک پروکسی به دلیل استفاده از indent)
+    # ذخیره در فایل JSON (هر خط یک پروکسی به همراه ساختار آرایه)
     with open("Socks5.json", "w", encoding="utf-8") as f:
         json.dump(final_list, f, indent=2)
     print("Saved to Socks5.json")
